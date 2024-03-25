@@ -52,7 +52,10 @@ C:\> whoami.exe /all /fo list
 - This mad possible by the access control lists (`ACLs`) 
 
 ## Workgroup:
-
+- No domain controllers
+- Users are typically local administrators of their own machines
+- Local groups cannot have users from other machines
+- To have a workgroup admin, you will need to create a separate administrative account on every machine.
 - In a workgroup, if you have a user in one computer you can't use the same user in another computer.
 - To do that, you will need to create the same account (same username and password) across all workgroup computers.
 - But keep in mind, that each user you create (even if the account have the same username and password) will have a different SID number on each computer.
@@ -60,4 +63,59 @@ C:\> whoami.exe /all /fo list
 ![[Workgroup.png]]
 
 # Windows Active Directory and Group Policy:
+
+### Active Directory Domains:
+
+- Active Directory (AD) is a database of user accounts and other information that gets installed on a Windows Server (a `Domain Controller`)
+
+### Domain Controllers:
+
+- A `domain controller` is just a server that helps to manage the AD database.
+- The AD database also contains all the SID numbers of the users, computers and groups.
+- Each resource (file, database, email box, printer, whatever) has a list of SID numbers attached to it with the permissions that each SID number has to the resource. This list of permissions based on user and group SID numbers is called an `access control list` (`ACL`)
+- `Multi-master replication`: When you make a change to the AD database on any domain controller in an AD domain, this change is then automatically replicated to all other domain controllers.
+- If there is a conflict, the latter change overrides the earlier one.
+- AD domain controllers use `timestamps` and `update sequence numbers` on every property of every object to keep the replication straight.
+- A domain controller (Windows Server 2008 or later) that run as Read-Only Domain Controller (`RODC`) - Any change on the AD database of the RODC will never be replicated to any other controllers.
+- `RODC` cache only the credentials of the groups specified by the  administrator.
+
+### A user in the Domain:
+
+- You are in the `domain` if you have an account (which have your SID number and other information about  you) in the Active Directory database.
+- A `domain` is all the users, computers, and groups that have accounts in the AD database.
+
+#### Who or what can be in the `domain`?
+
+- Anything with a SID number can be in a domain.
+- Users, groups, and computers have SID numbers.
+- Computers on windows active directory have their accounts and passwords and automatically update them periodically. When a computer that is a member of a domain boots up,  it logs into the domain just like a human.
+
+#### What else is in the active directory database?
+
+- `Account information`: is the most important thing in the AD database
+- Active Directory database is like a `registry` for the entire network.
+- Windows computers store all their configuration settings in a database called the `registry`
+- Active Directory can store many of the configuration settings for all users and computers. It stores these settings in the form of `Group Policy Objects` that modify Registries and other things.
+##### A list of what can be stored in Active Directory:
+
+- User account properties and passwords
+- Groups and their memberships
+- Computer properties and passwords
+- Domain names and trust relationships
+- Kerberos master keys
+- Digital certificates and Certificate Trust Lists
+- Organizational Units and their members
+- LANs and IP subnets in the organization
+- AD replication links and their settings
+- Shared printer locations (UNC paths)
+- Exchange Server directory information
+- Group Policy Objects
+- Any custom data you want to add
+
+> **Note**: Active directory is a general-purpose database and can be accessed through an industry standard protocol `LDAP`. Active Directory uses the same database engine as Microsoft Exchange Server and can store millions of objects. (Max Size = 4000GB  = 4TB)
+
+#### Global Vs Local Users/Groups:
+
+- `Local` users and groups  are accounts in the database of non-domain controllers.
+- `Domain` use, computer, group has its account in the AD database. These domain accounts are available for use by any computer that has joined the domain.
 
